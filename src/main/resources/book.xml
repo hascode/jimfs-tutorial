@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+	<book>
+		<title>Some Book</title>
+	</book>
+	<book>
+		<title>Another book</title>
+	</book>
+</books>

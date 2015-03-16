@@ -1,10 +1,12 @@
 package com.hascode.tutorial;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
@@ -23,6 +25,16 @@ public class Example {
 		Path csv = data.resolve("data.csv"); // /data/data.csv
 		Files.write(csv, ImmutableList.of("test1,test2\ntest3,test4"), StandardCharsets.UTF_8);
 
-		Files.list(data).forEach(System.out::println);
+		InputStream istream = Example.class.getResourceAsStream("/book.xml");
+		Path xml = data.resolve("book.xml");
+		Files.copy(istream, xml, StandardCopyOption.REPLACE_EXISTING);
+
+		Files.list(data).forEach(file -> {
+			try {
+				System.out.println(String.format("%s (%db)", file, Files.readAllBytes(file).length));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 }
