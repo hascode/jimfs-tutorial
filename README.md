@@ -8,9 +8,12 @@ Please feel free to have a look at [my blog] for the full tutorial.
 
 Using Gradle, simply run the following command:
 
-``
-   gradle run
-``   
+
+```
+#!bash
+
+gradle run
+```
 
 
 ----
@@ -18,4 +21,3 @@ Using Gradle, simply run the following command:
 **2015 Micha Kops / hasCode.com**
 
    [my blog]:http://www.hascode.com/
-
