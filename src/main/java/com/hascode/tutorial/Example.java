@@ -26,7 +26,7 @@ public class Example {
 		Files.write(csv, ImmutableList.of("test1,test2\ntest3,test4"), StandardCharsets.UTF_8);
 
 		InputStream istream = Example.class.getResourceAsStream("/book.xml");
-		Path xml = data.resolve("book.xml");
+		Path xml = data.resolve("book.xml"); // /data/book.xml
 		Files.copy(istream, xml, StandardCopyOption.REPLACE_EXISTING);
 
 		Files.list(data).forEach(file -> {
