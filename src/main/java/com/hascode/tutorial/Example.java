@@ -15,6 +15,12 @@ import com.google.common.jimfs.Jimfs;
 public class Example {
 
 	public static void main(final String[] args) throws IOException {
+		runExample1();
+		runExample2();
+	}
+
+	private static void runExample1() throws IOException {
+		System.out.println("Example 1: Creating, copying, reading files and directories");
 		FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
 		Path data = fs.getPath("/data");
 		Files.createDirectory(data);
@@ -37,4 +43,26 @@ public class Example {
 			}
 		});
 	}
+
+	private static void runExample2() throws IOException {
+		System.out.println("Example 2: Handling Symbolic Links");
+		FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
+		Path data = fs.getPath("/data");
+		Files.createDirectory(data);
+
+		Path hello = data.resolve("test.txt"); // /data/test.txt
+		Files.write(hello, ImmutableList.of("hello world"), StandardCharsets.UTF_8);
+
+		Path linkToHello = data.resolve("test.txt.link");
+		Files.createSymbolicLink(linkToHello, hello);
+
+		Files.list(data).forEach(file -> {
+			try {
+				System.out.println(String.format("%s (%db)", file, Files.readAllBytes(file).length));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
 }
