@@ -1,5 +1,8 @@
 package com.hascode.tutorial;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -7,6 +10,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
@@ -14,9 +20,10 @@ import com.google.common.jimfs.Jimfs;
 
 public class Example {
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException, InterruptedException {
 		runExample1();
 		runExample2();
+		runExample3();
 	}
 
 	private static void runExample1() throws IOException {
@@ -65,4 +72,32 @@ public class Example {
 		});
 	}
 
+	private static void runExample3() throws IOException, InterruptedException {
+		System.out.println("Example 3: Watching changes using a WatchService");
+		FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
+		Path data = fs.getPath("/data");
+		Files.createDirectory(data);
+
+		WatchService watcher = data.getFileSystem().newWatchService();
+		Thread watcherThread = new Thread(() -> {
+			WatchKey key;
+			try {
+				key = watcher.take();
+				while (key != null) {
+					for (WatchEvent<?> event : key.pollEvents()) {
+						System.out.printf("event of type: %s received for file: %s\n", event.kind(), event.context());
+					}
+					key.reset();
+					key = watcher.take();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, "CustomWatcher");
+		watcherThread.start();
+		data.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
+
+		Path hello = data.resolve("test.txt"); // /data/test.txt
+		Files.write(hello, ImmutableList.of("hello world"), StandardCharsets.UTF_8);
+	}
 }
